@@ -1,144 +1,121 @@
-# Proyecto E-commerce .NET Core
+# 🛒 EcommerceApp - ASP.NET Core Clean Architecture
 
-## Descripción
+Este proyecto es una aplicación de ecommerce construida utilizando **ASP.NET Core MVC** siguiendo los principios de **Clean Architecture** y **SOLID**, lo que permite un desarrollo limpio, escalable y mantenible.
 
-Este proyecto implementa una aplicación completa de comercio electrónico desarrollada con .NET Core siguiendo los principios de arquitectura N-Capas, Domain-Driven Design (DDD) y patrones de diseño modernos.
+---
 
-## Estructura del Proyecto
+## 📁 Estructura del Proyecto
 
-La solución está organizada en 4 capas principales:
-
-- **EcommerceApp.Web**: Interfaz de usuario MVC y punto de entrada de la aplicación
-- **Ecommerce.Application**: Servicios de aplicación e implementación de lógica de negocio
-- **Ecommerce.Domain**: Entidades de dominio y reglas de negocio core
-- **Ecommerce.Infrastructure**: Implementación de persistencia y servicios externos
-
-## Características Principales
-
-- Catálogo de productos con búsqueda y filtrado
-- Carrito de compras
-- Proceso de checkout
-- Sistema de pago seguro
-- Gestión de usuarios y autenticación
-- Gestión de pedidos
-- Descuentos y promociones
-
-## Requisitos
-
-- .NET 7.0 o superior
-- SQL Server (o base de datos compatible con EF Core)
-- Visual Studio 2022 / VS Code / Rider
-
-## Instalación
-
-1. Clonar el repositorio
-   ```bash
-   git clone https://github.com/yourusername/ecommerce-project.git
-   cd ecommerce-project
-   ```
-
-2. Restaurar paquetes NuGet
-   ```bash
-   dotnet restore
-   ```
-
-3. Configurar la cadena de conexión en `appsettings.json` en el proyecto EcommerceApp.Web
-   ```json
-   "ConnectionStrings": {
-     "DefaultConnection": "Server=(localdb)\\mssqllocaldb;Database=EcommerceDb;Trusted_Connection=True;MultipleActiveResultSets=true"
-   }
-   ```
-
-4. Aplicar migraciones para crear la base de datos
-   ```bash
-   cd EcommerceApp.Web
-   dotnet ef database update
-   ```
-
-5. Ejecutar la aplicación
-   ```bash
-   dotnet run
-   ```
-
-## Distribución por Módulos
-
-| Equipo | Módulo | Componentes |
-|--------|--------|------------|
-| MarsDiv | Checkout | Proceso de finalización de compra, envío |
-| Compila2 | Sistema de pago | Integración con pasarelas, procesamiento seguro |
-| Los DevOps | Gestión de pedidos | Estados, notificaciones, seguimiento |
-| Mentes Maestras | Catálogo y búsqueda | Filtros, categorías, inventario |
-| #504 | Carrito de compras | Gestión de productos, cantidades, cálculos |
-| Binomio Perfecto | Registro y autenticación | Login, registro, seguridad |
-
-## Arquitectura
-
-### Capa de Dominio (Ecommerce.Domain)
-
-Contiene las entidades principales:
-- User
-- Product
-- Category
-- Cart / CartItem
-- Order / OrderItem
-- Payment
-- Address
-- Discount
-
-### Capa de Aplicación (Ecommerce.Application)
-
-Implementa servicios que coordinan la lógica de negocio:
-- UserService
-- ProductService
-- CartService
-- OrderService
-- PaymentService
-
-### Capa de Infraestructura (Ecommerce.Infrastructure)
-
-Proporciona implementaciones concretas para acceso a datos:
-- ApplicationDbContext
-- Repositorios
-- Servicios externos
-- UnitOfWork
-
-### Capa de Presentación (EcommerceApp.Web)
-
-Gestiona la interfaz de usuario y la interacción:
-- Controllers
-- Views
-- ViewModels
-- Filtros y validación
-
-## Patrones Implementados
-
-- **Repository Pattern**: Para abstraer el acceso a datos
-- **Unit of Work**: Para mantener la consistencia en transacciones
-- **Dependency Injection**: Para desacoplar componentes
-- **DTO Pattern**: Para transferencia de datos entre capas
-- **Factory Pattern**: Para creación de objetos complejos
-
-## Convenciones de Código
-
-Este proyecto sigue las convenciones estándar de C# y .NET:
-- PascalCase para nombres de clases, propiedades y métodos
-- camelCase para variables locales y parámetros
-- Prefijo "I" para interfaces
-- Sufijo "Service", "Repository", "Controller" según corresponda
-
-## Testing
-
-Para ejecutar las pruebas unitarias:
-```bash
-dotnet test
+```
+project_ecommerce/
+├── Ecommerce.Domain            # Núcleo del negocio: entidades y contratos
+│   └── Entities/              # Clases como Product, Category
+│
+├── Ecommerce.Application       # Lógica de aplicación (casos de uso)
+│   ├── Interfaces/            # IProductService, ICategoryService
+│   └── Services/             # Implementaciones de servicios
+│
+├── Ecommerce.Infrastructure    # Implementaciones técnicas
+│   ├── Data/                  # AppDbContext y EF Core
+│   ├── Interfaces/            # Contratos de repositorios (ICategoryRepository)
+│   └── Repositories/          # Repositorios concretos usando EF Core
+│
+├── EcommerceApp.Web            # Capa de presentación (ASP.NET MVC)
+│   └── Controllers/           # Controladores MVC (ProductController)
 ```
 
-## Configuración de CI/CD
+---
 
-El proyecto incluye configuración para:
-- GitHub Actions
-- Azure DevOps Pipelines
+## ⚙️ Tecnologías Utilizadas
 
-## Licencia
+- ASP.NET Core MVC
+- Entity Framework Core
+- SQL Server (o SQLite)
+- .NET 7.0 / .NET 8.0
+- Bootstrap (opcional)
+- AutoMapper (opcional)
+- FluentValidation (opcional)
 
-Este proyecto está licenciado bajo [MIT License](LICENSE).
+---
+
+## 🚀 Instalación y Ejecución
+
+### 1. Clona el proyecto
+
+```bash
+git clone https://github.com/tu_usuario/project_ecommerce.git
+cd project_ecommerce
+```
+
+### 2. Configura la cadena de conexión
+
+Edita el archivo `appsettings.json` en `EcommerceApp.Web`:
+
+```json
+"ConnectionStrings": {
+  "DefaultConnection": "Server=(localdb)\\MSSQLLocalDB;Database=EcommerceDb;Trusted_Connection=True;"
+}
+```
+
+### 3. Aplica las migraciones
+
+```bash
+cd EcommerceApp.Web
+dotnet ef database update
+```
+
+### 4. Ejecuta la aplicación
+
+```bash
+dotnet run --project EcommerceApp.Web
+```
+
+---
+
+## 📚 Principios Aplicados
+
+### ✅ Clean Architecture
+
+- Separación por capas: `Domain`, `Application`, `Infrastructure`, `Web`.
+- Independencia de tecnologías y frameworks en el núcleo del negocio.
+
+### ✅ SOLID
+
+- **S**: Cada clase tiene una única responsabilidad.
+- **O**: El código está abierto a extensión, cerrado a modificación.
+- **L**: Sustitución de interfaces respetando contratos.
+- **I**: Interfaces pequeñas y específicas.
+- **D**: Inyección de dependencias para acoplamiento mínimo.
+
+---
+
+## ✅ Funcionalidades actuales
+
+- CRUD de productos
+- CRUD de categorías
+- Vista de listado y detalles
+- Uso de DropDowns para categorías
+- Separación por responsabilidades
+- Inyección de dependencias
+
+---
+
+## 🛠 Por hacer / mejoras sugeridas
+
+- Validación con FluentValidation
+- AutoMapper entre entidades y DTOs
+- Autenticación / autorización
+- Carga de imágenes de productos
+- API REST (controladores Web API)
+
+---
+
+## 🧑‍💻 Autor
+
+Desarrollado por 
+
+---
+
+## 📄 Licencia
+
+Este proyecto está bajo la licencia MIT.
