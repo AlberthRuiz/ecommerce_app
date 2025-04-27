@@ -58,3 +58,8 @@ nunit-*.xml
 /.vs/project_ecommerce/CopilotIndices/17.13.441.19478
 /.vs/project_ecommerce/FileContentIndex
 /.vs
+# No subir la fábrica de DbContext en Infrastructure
+Ecommerce.Infrastructure/DesignTimeDbContextFactory.cs
+
+# No subir configuración de entorno (secrets)
+EcommerceApp.Web/appsettings.json

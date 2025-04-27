@@ -6,8 +6,9 @@ using Microsoft.AspNetCore.Authorization;
 using Ecommerce.Application.Interfaces;
 using Ecommerce.Application.DTOs;
 using Ecommerce.Domain.Entities;
+using Ecommerce.Application.Mappers;
 
-namespace Ecommerce.API.Controllers
+namespace Ecommerce.Web.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
@@ -21,18 +22,11 @@ namespace Ecommerce.API.Controllers
         }
 
         [HttpGet]
-        
         public async Task<ActionResult<IEnumerable<PaymentDTO>>> GetAllPayments()
         {
             var payments = await _paymentService.GetAllPaymentsAsync();
-            var paymentDTOs = new List<PaymentDTO>();
-
-            foreach (var payment in payments)
-            {
-                paymentDTOs.Add(MapToDTO(payment));
-            }
-
-            return Ok(paymentDTOs);
+            var dtos = payments.Select(p => p.ToDTO());
+            return Ok(dtos);
         }
 
         [HttpGet("{id}")]
@@ -43,7 +37,7 @@ namespace Ecommerce.API.Controllers
             if (payment == null)
                 return NotFound();
 
-            return Ok(MapToDTO(payment));
+            return Ok(payment.ToDTO());
         }
 
         [HttpGet("order/{orderId}")]
@@ -51,37 +45,25 @@ namespace Ecommerce.API.Controllers
         public async Task<ActionResult<IEnumerable<PaymentDTO>>> GetPaymentsByOrderId(int orderId)
         {
             var payments = await _paymentService.GetPaymentsByOrderIdAsync(orderId);
-            var paymentDTOs = new List<PaymentDTO>();
-
-            foreach (var payment in payments)
-            {
-                paymentDTOs.Add(MapToDTO(payment));
-            }
-
-            return Ok(paymentDTOs);
+            var dtos = payments.Select(p => p.ToDTO());
+            return Ok(dtos);
         }
 
         [HttpPost]
-        
-        public async Task<ActionResult<PaymentDTO>> ProcessPayment([FromBody] CreatePaymentDTO createPaymentDTO)
+        public async Task<ActionResult<PaymentDTO>> ProcessPayment([FromBody] CreatePaymentDTO createDto)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
+            var entity = createDto.ToEntity();
             try
             {
-                var payment = new Payment
-                {
-                    OrderId = createPaymentDTO.OrderId,
-                    Amount = createPaymentDTO.Amount,
-                    PaymentMethod = createPaymentDTO.PaymentMethod,
-                    CardLastFour = createPaymentDTO.CardLastFour,
-                    CardType = createPaymentDTO.CardType,
-                    PaymentDate = DateTime.Now
-                };
-
-                var createdPayment = await _paymentService.ProcessPaymentAsync(payment);
-                return CreatedAtAction(nameof(GetPaymentById), new { id = createdPayment.PaymentId }, MapToDTO(createdPayment));
+                var created = await _paymentService.ProcessPaymentAsync(entity);
+                return CreatedAtAction(
+                    nameof(GetPaymentById),
+                    new { id = created.PaymentId },
+                    created.ToDTO()
+                );
             }
             catch (Exception ex)
             {
@@ -90,16 +72,15 @@ namespace Ecommerce.API.Controllers
         }
 
         [HttpPut("status")]
-       
-        public async Task<ActionResult<PaymentDTO>> UpdatePaymentStatus([FromBody] UpdatePaymentStatusDTO updateDTO)
+        public async Task<ActionResult<PaymentDTO>> UpdatePaymentStatus([FromBody] UpdatePaymentStatusDTO updateDto)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
             try
             {
-                var updatedPayment = await _paymentService.UpdatePaymentStatusAsync(updateDTO.PaymentId, updateDTO.PaymentStatus);
-                return Ok(MapToDTO(updatedPayment));
+                var updated = await _paymentService.UpdatePaymentStatusAsync(updateDto.PaymentId, updateDto.PaymentStatus);
+                return Ok(updated.ToDTO());
             }
             catch (KeyNotFoundException)
             {
@@ -112,7 +93,6 @@ namespace Ecommerce.API.Controllers
         }
 
         [HttpPost("{id}/refund")]
-        
         public async Task<ActionResult> RefundPayment(int id)
         {
             try
@@ -120,8 +100,8 @@ namespace Ecommerce.API.Controllers
                 var result = await _paymentService.RefundPaymentAsync(id);
                 if (result)
                     return Ok(new { message = "Pago reembolsado correctamente" });
-                else
-                    return BadRequest(new { message = "No se pudo procesar el reembolso" });
+
+                return BadRequest(new { message = "No se pudo procesar el reembolso" });
             }
             catch (KeyNotFoundException)
             {
@@ -134,7 +114,6 @@ namespace Ecommerce.API.Controllers
         }
 
         [HttpDelete("{id}")]
-       
         public async Task<ActionResult> DeletePayment(int id)
         {
             try
@@ -142,30 +121,13 @@ namespace Ecommerce.API.Controllers
                 var result = await _paymentService.DeletePaymentAsync(id);
                 if (result)
                     return Ok(new { message = "Pago eliminado correctamente" });
-                else
-                    return NotFound();
+
+                return NotFound();
             }
             catch (Exception ex)
             {
                 return BadRequest(new { message = ex.Message });
             }
-        }
-
-        // Método auxiliar para mapear de entidad a DTO
-        private PaymentDTO MapToDTO(Payment payment)
-        {
-            return new PaymentDTO
-            {
-                PaymentId = payment.PaymentId,
-                OrderId = payment.OrderId,
-                Amount = payment.Amount,
-                PaymentMethod = payment.PaymentMethod,
-                PaymentDate = payment.PaymentDate,
-                PaymentStatus = payment.PaymentStatus,
-                TransactionId = payment.TransactionId,
-                CardLastFour = payment.CardLastFour,
-                CardType = payment.CardType
-            };
         }
     }
 }
